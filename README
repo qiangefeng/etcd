@@ -1,0 +1,24 @@
+mkdir -p /root/etcd-data
+docker run \
+  -p 2379:2379 \
+  -p 2380:2380 \
+  -d \
+  -v /root/etcd-data:/etcd-data \
+  --name etcd \
+  qiangefeng/etcd:latest \
+  etcd \
+  --data-dir=/etcd-data \
+  --name node1 \
+  --initial-advertise-peer-urls http://0.0.0.0:2380 \
+  --initial-cluster node1=http://0.0.0.0:2380 \
+  --listen-peer-urls http://0.0.0.0:2380 \
+  --listen-client-urls http://0.0.0.0:2379 \
+  --advertise-client-urls http://0.0.0.0:2379 
+  
+  
+docker exec etcd /bin/sh -c "etcdctl version"
+docker exec etcd /bin/sh -c "etcdctl endpoint health"
+docker exec etcd /bin/sh -c "etcdctl put /public/foo bar"
+docker exec etcd /bin/sh -c "etcdctl get /public/foo"
+docker exec etcd /bin/sh -c "etcdctl del /public/foo"
+docker exec etcd /bin/sh -c "etcdctl get / --prefix"
